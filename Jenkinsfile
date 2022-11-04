@@ -1,15 +1,30 @@
-pipeline{
+pipeline {
     agent any
-    environment{
-        AWS_DEFAULT_REGION="us-east-1"
+    tools {
+       terraform 'terraform'
     }
     stages {
-        stage('Example') {
-            steps {
-                echo "HI"
+        stage('Git checkout') {
+           steps{
+                git branch: 'main', credentialsId: 'button-aws-creds', url: 'https://github.com/Mayankagg44/Terraform-demo/blob/main/first.tf'
             }
         }
-        stage('Building') {
-            steps {
-                withCredentials([aws(credentialsId: "760451896171", accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                  sh''
+        stage('terraform format check') {
+            steps{
+                sh 'terraform fmt'
+            }
+        }
+        stage('terraform Init') {
+            steps{
+                sh 'terraform init'
+            }
+        }
+        stage('terraform apply') {
+            steps{
+                sh 'terraform apply --auto-approve'
+            }
+        }
+    }
+
+    
+}
